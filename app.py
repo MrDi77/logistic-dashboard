@@ -376,13 +376,21 @@ if not st.session_state.result_df.empty:
         gantt_data.append(dict(Task=f"М{row['Машина']}", Start=start_load, Finish=end_load, Type="Погрузка"))
         gantt_data.append(dict(Task=f"М{row['Машина']}", Start=arrive, Finish=depart, Type="Разгрузка"))
 
-    fig = go.Figure()
-    for item in gantt_
-        fig.add_trace(go.Bar(y=[item["Task"]], x=[(item["Finish"]-item["Start"]).seconds/3600],
-                           base=item["Start"], orientation='h', marker_color="steelblue" if item["Type"]=="Погрузка" else "green",
-                           showlegend=False))
-    fig.update_layout(title="Gantt", height=400)
-    st.plotly_chart(fig, use_container_width=True)
+fig = go.Figure()
+        if gantt_data:  # Проверяем, что данные есть
+            for item in gantt_data:  # ← Добавлено : и исправлено имя
+                fig.add_trace(go.Bar(
+                    y=[item["Task"]],
+                    x=[(item["Finish"] - item["Start"]).total_seconds() / 3600],
+                    base=item["Start"],
+                    orientation='h',
+                    marker_color="steelblue" if item["Type"] == "Погрузка" else "green",
+                    showlegend=False
+                ))
+            fig.update_layout(title="Gantt", height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.info("Нет данных для отображения графика.")
 
 # Карта
 if st.session_state.gmaps_api_key and not st.session_state.result_df.empty:
